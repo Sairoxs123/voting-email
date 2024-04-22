@@ -172,13 +172,13 @@ def submitVote(request):
 
         for i in positions:
             inst = Contestants.objects.get(name=i)
-            Votes(student=student, contestant=inst).save()
+            Votes(student=student, contestant=inst, email=email).save()
             inst.votes += 1
             inst.save()
 
             from datetime import date
 
-            History(jssid=student.jssid, student_name=student.name, contestant_name=inst.name, position=inst.position, date=date.today()).save()
+            History(jssid=student.jssid, student_name=student.name, contestant_name=inst.name, position=inst.position, date=date.today(), email=email).save()
 
         request.session["verified"] = None
 
@@ -208,12 +208,12 @@ def details(request):
         if letters != 1 or numbers != 4:
             return render(request, "message.html", {"error":"jssid"})
 
-        #try:
-        #    student = Students.objects.get(jssid=jssid)
-#
-        #except:
-        #    return render(request, "message.html", {"error":"jssid"})
-#
+        try:
+            student = Students.objects.get(jssid=jssid)
+
+        except:
+            return render(request, "message.html", {"error":"jssid"})
+
         #x = Votes.objects.all().filter(student=student)
 #
         #if len(x) > 0:
