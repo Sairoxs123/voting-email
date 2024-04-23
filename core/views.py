@@ -154,7 +154,7 @@ def details(request):
         if not session_open:
             return render(request, "message.html", {"error":"closed"})
 
-        if letters != 1 or numbers != 4:
+        if letters != 1 or numbers < 3:
             return render(request, "message.html", {"error":"jssid"})
 
         try:

@@ -315,7 +315,7 @@
         }
         document.getElementById("jssid-input").addEventListener("input", () => {
             let input = document.getElementById("jssid-input").value;
-            if (input.length == 5) {
+            if (input.length >= 4) {
                 document.getElementById("jssid-button").style.display = "block";
             } else {
                 document.getElementById("jssid-button").style.display = "none";
