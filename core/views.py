@@ -6,10 +6,12 @@ import smtplib
 import ssl
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-
 # Create your views here.
 
 adminpassword = "hello"
+
+session_open = False
+
 
 def index(request):
     return render(request, "index.html")
@@ -40,14 +42,14 @@ def admin(request):
 
     contestants = Contestants.objects.all()
 
-    return render(request, "admin.html", {"contestants":contestants, "open":request.session.get("open")})
+    return render(request, "admin.html", {"contestants":contestants, "open":session_open})
 
 
 
 def addContenstant(request):
 
     if request.method == "POST":
-        name = request.POST.get("name").title()
+        name = request.POST.get("name").title().strip()
         position = request.POST.get("position").title()
         photo = request.FILES.get("image")
 
@@ -117,12 +119,9 @@ def votingFormMobile(request):
     headgirls = Contestants.objects.all().filter(position="Headgirl")
     sportsboys = Contestants.objects.all().filter(position="Sports Captain Boy")
     sportsgirls = Contestants.objects.all().filter(position="Sports Captain Girl")
-    dheadboys = Contestants.objects.all().filter(position="Deputy Headboy")
-    dheadgirls = Contestants.objects.all().filter(position="Deputy Headgirl")
-    dsportsboys = Contestants.objects.all().filter(position="Deputy Sports Captain Boy")
-    dsportsgirls = Contestants.objects.all().filter(position="Deputy Sports Captain Girl")
 
-    return render(request, "vote-mobile.html", {"headboys" : headboys, "headgirls" : headgirls, "sportsboys" : sportsboys, "sportsgirls" : sportsgirls, "dheadboys" : dheadboys, "dheadgirls" : dheadgirls, "dsportsboys" : dsportsboys, "dsportsgirls" : dsportsgirls})
+    return render(request, "vote-mobile.html", {"headboys" : headboys, "headgirls" : headgirls, "sportsboys" : sportsboys, "sportsgirls" : sportsgirls})
+
 
 def generateToken():
     import random
@@ -135,56 +134,6 @@ def generateToken():
 
     return special
 
-
-def submitVote(request):
-    if request.method == 'POST':
-
-        if not request.session.get("verified"):
-            return render(request, "message.html", {"error":"na"})
-
-        headboy = request.POST.get("headboy")
-        headgirl = request.POST.get("headgirl")
-        sportsboy = request.POST.get("sportsboy")
-        sportsgirl = request.POST.get("sportsgirl")
-        dheadboy = request.POST.get("dheadboy")
-        dheadgirl = request.POST.get("dheadgirl")
-        dsportsboy = request.POST.get("dsportsboy")
-        dsportsgirl = request.POST.get("dsportsgirl")
-        jssid = request.session["jssid"]
-        date = request.session["date"]
-        email = request.session["email"]
-
-
-        if not request.session.get("open"):
-            return render(request, "message.html", {"error":"closed"})
-
-        student = Students.objects.get(jssid=jssid)
-
-        if not headboy or not headgirl or not sportsboy or not sportsgirl or not dheadboy or not dheadgirl or not dsportsboy or not dsportsgirl or not jssid:
-            return render(request, "message.html")
-
-        x = Votes.objects.all().filter(student=student)
-
-        if len(x) > 0:
-            return render(request, "message.html", {"error":"done"})
-
-        positions = [headboy, headgirl, sportsboy, sportsgirl, dheadboy, dheadgirl, dsportsboy, dsportsgirl]
-
-        for i in positions:
-            inst = Contestants.objects.get(name=i)
-            Votes(student=student, contestant=inst, email=email).save()
-            inst.votes += 1
-            inst.save()
-
-            from datetime import date
-
-            History(jssid=student.jssid, student_name=student.name, contestant_name=inst.name, position=inst.position, date=date.today(), email=email).save()
-
-        request.session["verified"] = None
-
-        return render(request, "thank you.html")
-
-    return HttpResponse("Invalid request")
 
 def details(request):
     if request.method == "POST":
@@ -202,7 +151,7 @@ def details(request):
 
         jssid = "JSSPS" + jssid
 
-        if not request.session.get("open"):
+        if not session_open:
             return render(request, "message.html", {"error":"closed"})
 
         if letters != 1 or numbers != 4:
@@ -263,6 +212,59 @@ def details(request):
 
     return render(request, "details.html")
 
+def submitVote(request):
+    if request.method == 'POST':
+
+        if not request.session.get("verified"):
+            return render(request, "message.html", {"error":"na"})
+
+        headboy = request.POST.get("headboy")
+        headgirl = request.POST.get("headgirl")
+        sportsboy = request.POST.get("sportsboy")
+        sportsgirl = request.POST.get("sportsgirl")
+        dheadboy = request.POST.get("dheadboy")
+        dheadgirl = request.POST.get("dheadgirl")
+        dsportsboy = request.POST.get("dsportsboy")
+        dsportsgirl = request.POST.get("dsportsgirl")
+        jssid = request.session["jssid"]
+        date = request.session["date"]
+        email = request.session["email"]
+
+        student = Students.objects.get(jssid=jssid)
+
+        if not headboy or not headgirl or not sportsboy or not sportsgirl or not dheadboy or not dheadgirl or not dsportsboy or not dsportsgirl or not jssid:
+            return render(request, "message.html")
+
+        if not session_open:
+            return render(request, "message.html", {"error":"closed"})
+
+        #x = Votes.objects.all().filter(student=student)
+#
+        #if len(x) > 0:
+        #    return render(request, "message.html", {"error":"done"})
+
+        x = Votes.objects.all().filter(email=email)
+
+        if len(x) > 0:
+            return render(request, "message.html", {"error":"done"})
+
+        positions = [headboy, headgirl, sportsboy, sportsgirl, dheadboy, dheadgirl, dsportsboy, dsportsgirl]
+
+        for i in positions:
+            inst = Contestants.objects.get(name=i)
+            Votes(student=student, contestant=inst, email=email).save()
+            inst.votes += 1
+            inst.save()
+
+            from datetime import date
+
+            History(jssid=student.jssid, student_name=student.name, contestant_name=inst.name, position=inst.position, date=date.today(), email=email).save()
+
+        request.session["verified"] = None
+
+        return render(request, "thank you.html")
+
+    return HttpResponse("Invalid request")
 
 def emailSent(request):
 
@@ -275,7 +277,7 @@ def emailSent(request):
 
 def verifyEmail(request):
 
-    if not request.session.get("open"):
+    if not session_open:
         return render(request, "message.html", {"error":"closed"})
 
     token = request.GET.get("token")
@@ -297,7 +299,6 @@ def verifyEmail(request):
         request.session["verified"] = True
 
     return redirect("/voting/form/")
-
 
 
 def resetVotes(request):
@@ -335,14 +336,14 @@ def createCSV(request):
     root_dir = os.path.join(os.getcwd(), "assets")
 
     fh = open(os.path.join(root_dir, "votes.csv"), "w")
-    data = "S.No, Name of student, JSSID, Grade, Name of contestant, Position\n"
+    data = "S.No, Email, Name of student, JSSID, Grade, Name of contestant, Position\n"
     #fh.write("S.No, Name of student, JSSID, Grade, Name of contestant, Position\n")
 
     count = 0
 
     for i in votes:
         count += 1
-        data += f"{count}, {i.student.name}, {i.student.jssid}, {i.student.grade_sec.strip()}, {i.contestant.name}, {i.contestant.position}\n"
+        data += f"{count}, {i.email}, {i.student.name}, {i.student.jssid}, {i.student.grade_sec.strip()}, {i.contestant.name}, {i.contestant.position}\n"
         #fh.write(line)
 
     fh.write(data)
@@ -381,10 +382,10 @@ def saveStudentsData(request):
     grades = {
         #"junior": [],
         #"middle": [],
-        "high": []
+        #"high": []
     }
 
-    #junior = ["I", "II", "III", "IV", "V"]
+    #junior = ["III", "IV", "V"]
     #middle = ["VI", "VII", "VIII"]
     high = ["IX", "X", "XI", "XII"]
 
@@ -393,12 +394,12 @@ def saveStudentsData(request):
 
         #if tokens[3] in junior:
         #    grades["junior"].append(
-        #        {"name":tokens[1], "jssid":tokens[0]}
+        #        {"name":tokens[1], "jssid":tokens[0], "class":tokens[3] + tokens[4]}
         #    )
     #
         #if tokens[3] in middle:
         #    grades["middle"].append(
-        #        {"name":tokens[1], "jssid":tokens[0]}
+        #        {"name":tokens[1], "jssid":tokens[0], "class":tokens[3] + tokens[4]}
         #    )
 
         if tokens[3] in high:
@@ -415,14 +416,17 @@ def saveStudentsData(request):
 
 
 def openVoting(request):
-    request.session["open"] = True
+    global session_open
+    session_open = True
 
     return redirect("/admin")
 
 def closeVoting(request):
-    request.session["open"] = False
+    global session_open
+    session_open = False
 
     return redirect("/admin")
+
 
 def logout(request):
     del request.session["logged-in"]

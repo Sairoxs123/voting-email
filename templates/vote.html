@@ -47,6 +47,13 @@
             text-decoration: none;
         }
 
+        #jss-logo {
+            position: absolute;
+            top: 10px;
+            right: 30px;
+            border-radius: 50%;
+        }
+
         .container {
             position: absolute;
             margin-top: 5%;
@@ -73,7 +80,7 @@
             max-width: 87%;
             height: 60%;
             margin: 0 auto;
-            margin-top: 3%;
+            margin-top: 5%;
             border-radius: 10px;
             box-shadow: 7.5px 10px #888888;
         }
@@ -106,14 +113,14 @@
 
         .picture-box-container {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             margin-top: 20px;
             width: 100%;
         }
 
         .picture-box {
             position: relative;
-            width: 100%;
+            width: 25%;
             height: 313;
             padding-left: 1%;
             padding-right: 1%;
@@ -226,6 +233,7 @@
             transition: linear 50ms;
         }
 
+
         #headgirl,
         #sportscaptainboys,
         #sportscaptaingirl,
@@ -281,6 +289,11 @@
             border-radius: 10px;
             background: linear-gradient(135deg, #3498db, #e74c3c, #2ecc71, #f39c12);
             animation: gradientBG 1s ease-in infinite;
+            font-size: 40px;
+            color: black;
+            display: flex;
+            justify-content: center;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -289,14 +302,16 @@
     <div id="main">
         <form action="{% url 'submit' %}" method="post" id="vote"> {% csrf_token %} </form> <a href="{% url 'home' %}"
             id="homelink" class="btn btn-primary">Home</a>
-        <div class="container" style="width: 100%;">
+        <img src="https://pbs.twimg.com/profile_images/987687428365389825/F42jiM8p_400x400.jpg" width="100" height="100"
+            id="jss-logo">
+        <div class="container" style="width: 100%; margin-top: 6%;">
             <div class="progress">
                 <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="70"
                     aria-valuemin="0" aria-valuemax="100" style="width:0%" id="line"> </div>
             </div>
         </div>
         <center>
-            <font style="color:white; font-size:45px; font-weight: bold; ">VOTE!!!</font>
+            <font style="color:white; font-size:45px; font-weight: bold; text-decoration: underline;" id="date"></font>
         </center>
     </div>
     <!--HEADBOY-->
@@ -304,9 +319,8 @@
         <div class="big-box" onchange="check_headboy()">
             <center>
                 <font
-                    style="color:black; font-size:40px; font-weight: bold; padding: 5px; padding-left:400px; padding-right: 400px;"
                     class="post">
-                    Head Boy</font>
+                    Head Boy - High School</font>
             </center>
             <div class="picture-box-container"> {% for i in headboys %} <div class="picture-box"> <input form="vote"
                         type="radio" name="headboy" style="content: url('{{ i.photo.url }}');" class="img"
@@ -323,9 +337,8 @@
         <div class="big-box" onchange="check_headgirl()">
             <center>
                 <font
-                    style="color:black; font-size:40px; font-weight: bold; background-color: #E1F2F5; padding: 5px; padding-left:400px; padding-right: 400px;"
                     class="post">
-                    Head Girl</font>
+                    Head Girl - High School</font>
             </center>
             <div class="picture-box-container"> {% for i in headgirls %} <div class="picture-box"> <input form="vote"
                         type="radio" name="headgirl" style="content: url('{{ i.photo.url }}');" class="img"
@@ -343,9 +356,8 @@
         <div class="big-box" onchange="check_sportsboy()">
             <center>
                 <font
-                    style="color:black; font-size:40px; font-weight: bold; background-color: #E1F2F5; padding: 5px; padding-left:300px; padding-right: 300px;"
                     class="post">
-                    Sports Captain Boy</font>
+                    Sports Captain Boy - High School</font>
             </center>
             <div class="picture-box-container"> {% for i in sportsboys %} <div class="picture-box"> <input form="vote"
                         type="radio" name="sportsboy" style="content: url('{{ i.photo.url }}');" class="img"
@@ -364,9 +376,8 @@
         <div class="big-box" onchange="check_sportsgirl()">
             <center>
                 <font
-                    style="color:black; font-size:40px; font-weight: bold; background-color: #E1F2F5; padding: 5px; padding-left:300px; padding-right: 300px;"
                     class="post">
-                    Sports Captain Girl</font>
+                    Sports Captain Girl - High School</font>
             </center>
             <div class="picture-box-container"> {% for i in sportsgirls %} <div class="picture-box"> <input form="vote"
                         type="radio" name="sportsgirl" style="content: url('{{ i.photo.url }}');" class="img"
@@ -385,9 +396,8 @@
         <div class="big-box" onchange="check_dheadboy()">
             <center>
                 <font
-                    style="color:black; font-size:40px; font-weight: bold; background-color: #E1F2F5; padding: 5px; padding-left:320px; padding-right: 320px;"
                     class="post">
-                    Deputy Head Boy</font>
+                    Deputy Head Boy - High School</font>
             </center>
             <div class="picture-box-container"> {% for i in dheadboys %} <div class="picture-box"> <input form="vote"
                         type="radio" name="dheadboy" style="content: url('{{ i.photo.url }}');" class="img"
@@ -406,9 +416,8 @@
         <div class="big-box" onchange="check_dheadgirl()">
             <center>
                 <font
-                    style="color:black; font-size:40px; font-weight: bold; background-color: #E1F2F5; padding: 5px; padding-left:320px; padding-right: 320px;"
                     class="post">
-                    Deputy Head Girl</font>
+                    Deputy Head Girl - High School</font>
             </center>
             <div class="picture-box-container"> {% for i in dheadgirls %} <div class="picture-box"> <input form="vote"
                         type="radio" name="dheadgirl" style="content: url('{{ i.photo.url }}');" class="img"
@@ -427,9 +436,8 @@
         <div class="big-box" onchange="check_dsportsboy()">
             <center>
                 <font
-                    style="color:black; font-size:40px; font-weight: bold; background-color: #E1F2F5; padding: 5px; padding-left:250px; padding-right: 250px;"
                     class="post">
-                    Deputy Sports Captain Boys</font>
+                    Deputy Sports Captain Boys - High School</font>
             </center>
             <div class="picture-box-container"> {% for i in dsportsboys %} <div class="picture-box"> <input form="vote"
                         type="radio" name="dsportsboy" style="content: url('{{ i.photo.url }}');" class="img"
@@ -448,9 +456,8 @@
         <div class="big-box" onchange="check_dsportsgirl()">
             <center>
                 <font
-                    style="color:black; font-size:40px; font-weight: bold; background-color: #E1F2F5; padding: 5px; padding-left:250px; padding-right: 250px;"
                     class="post">
-                    Deputy Sports Captain Girls</font>
+                    Deputy Sports Captain Girls - High School</font>
             </center>
             <div class="picture-box-container"> {% for i in dsportsgirls %} <div class="picture-box"> <input form="vote"
                         type="radio" name="dsportsgirl" style="content: url('{{ i.photo.url }}');" class="img"
@@ -466,6 +473,11 @@
                 style="display: none;">Confirm</button> </div>
     </div>
     </div>
+    <center>
+        <font style="color:white; font-size:45px; font-weight: bold; position: fixed; left: 38%; bottom: 7.5%;">Time
+            Remaining = <span id="time"></span>
+        </font>
+    </center>
     <div id="confirmation"> </div>
     <script>
         const html = document.querySelector("html");
@@ -492,6 +504,29 @@
                 return false;
             }
         };
+
+        let dateObj = new Date();
+        let date = `${dateObj.getDate()}-${dateObj.getMonth() + 1}-${dateObj.getFullYear()}`;
+        document.getElementById("date").innerHTML = date
+
+
+        let time = 60 * 5; // Time in seconds
+
+        let timer = setInterval(() => {
+            if (time > -1) {
+                let minutes = Math.floor(time / 60);
+                let seconds = time % 60;
+
+                document.getElementById("time").innerHTML = `${minutes}:${seconds}`
+                time--;
+            } else {
+                clearInterval(timer)
+                alert("You have taken too long to cast your vote. This session has expired. Please restart your voting process.");
+                window.location.reload()
+            }
+        }, 1000)
+
+        let jssid = document.getElementById("jssid");
         let headboy = document.getElementById("headboy");
         let headgirl = document.getElementById("headgirl");
         let sportscaptainboys = document.getElementById("sportscaptainboys");
@@ -509,16 +544,15 @@
         function next(a, b) {
             a.style.display = "none";
             b.style.display = "block";
-            x += 12.5;
+            x += Math.round(100 / 9);
             document.getElementById("line").style.width = x + "%";
         }
         function prev(a, b) {
             a.style.display = "block";
             b.style.display = "none";
-            x -= 12.5;
+            x -= Math.round(100 / 9);
             document.getElementById("line").style.width = x + "%";
         }
-
         let headboy_options = document.getElementsByName("headboy");
         let headgirl_options = document.getElementsByName("headgirl");
         let sportscaptainboys_options = document.getElementsByName("sportsboy");
@@ -527,6 +561,7 @@
         let deputyheadgirl_options = document.getElementsByName("dheadgirl");
         let deputysportscaptainboys_options = document.getElementsByName("dsportsboy");
         let deputysportscaptaingirl_options = document.getElementsByName("dsportsgirl");
+
         function selected(options) {
             for (let i = 0; i < options.length; i++) {
                 if (options[i].checked) {
@@ -730,6 +765,8 @@
                 document.getElementById("dsportsgirl-button").style.display = "none";
             }
         }
+
+
 
     </script>
 </body>
